@@ -324,7 +324,7 @@ class TextBufferingContentHandler(sax.handler.ContentHandler):
         This implementation saves the text from the buffer. Then it resets and
         truncates the buffer.
         """
-        self._text = self._buffer.getvalue()
+        self._text = self._buffer.getvalue().decode('utf-8')
         self._reset_truncate()
 
     def characters(self, content):
@@ -334,7 +334,7 @@ class TextBufferingContentHandler(sax.handler.ContentHandler):
 
         This implementation writes to the buffer.
         """
-        self._buffer.write(content)
+        self._buffer.write(content.encode('utf-8'))
 
     def _reset_truncate(self):
         self._buffer.reset()
@@ -598,7 +598,7 @@ class ItemsContentHandler(sax.handler.ContentHandler):
         This instance manipulates the tag stack, creating a new instance if
         it's length is 1. Saves value as None if the nil attribute is present.
         """
-        log.debug('ItemsContentHandler startElementNS {0} v="{1}" t="{2}" {3}'
+        log.debug(u'ItemsContentHandler startElementNS {0} v="{1}" t="{2}" {3}'
                   .format(name, self._value, self._text_buffer.text,
                           self._tag_stack))
         tag = create_tag_comparer(name)
@@ -623,7 +623,7 @@ class ItemsContentHandler(sax.handler.ContentHandler):
         the text as a date and saves it for later use when the properties
         element is closed.
         """
-        log.debug('ItemsContentHandler endElementNS {0} v="{1}" t="{2}" {3}'
+        log.debug(u'ItemsContentHandler endElementNS {0} v="{1}" t="{2}" {3}'
                   .format(name, self._value, self._text_buffer.text,
                           self._tag_stack))
         tag = create_tag_comparer(name)
