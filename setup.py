@@ -9,6 +9,8 @@
 #
 ##############################################################################
 
+import unittest
+
 setup_kwargs = dict(
     name='txwinrm',
     version='1.1.20',
@@ -20,6 +22,7 @@ setup_kwargs = dict(
     url='https://github.com/zenoss/txwinrm',
     packages=['txwinrm', 'txwinrm.request'],
     package_data={'txwinrm.request': ['*.xml']},
+    test_suite='txwinrm.test',
     scripts=[
         'scripts/winrm',
         'scripts/winrs',
