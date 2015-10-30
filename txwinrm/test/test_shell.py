@@ -16,6 +16,7 @@ from .tools import create_get_elem_func
 from ..shell import _build_command_line_elem, _stripped_lines, \
     _find_shell_id, _find_command_id, _find_stream, _find_exit_code, \
     CommandResponse, SingleShotCommand, LongRunningCommand, Typeperf
+from ..util import EtreeRequestSender, ConnectionInfo
 
 DATADIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "data_shell")
@@ -36,6 +37,7 @@ class FakeRequestSender(object):
 
     hostname = 'fake_host'
     _receive_resp = 'receive_resp_01.xml'
+    _conn_info = ConnectionInfo("10.30.50.34", "kerberos", "rbooth@SOLUTIONS.LOC", "", "http", 5985, "Keep-Alive", "/home/zenoss/rbooth.keytab", '')
 
     def send_request(self, request_template_name, **kwargs):
         elem = None
@@ -50,7 +52,7 @@ class FakeRequestSender(object):
             elem = get_elem(self._receive_resp)
             self._receive_resp = 'receive_resp_02.xml'
 
-        return defer.succeed(elem)
+        return defer.returnValue(elem)
 
 
 class TestBuildCommandLineElem(unittest.TestCase):
@@ -148,7 +150,7 @@ class TestSingleShotCommand(unittest.TestCase):
 
     @defer.inlineCallbacks
     def test_run_command(self):
-        command = SingleShotCommand(FakeRequestSender())
+        command = SingleShotCommand(EtreeRequestSender(FakeRequestSender()))
         cmd_response = yield command.run_command('foo')
         self.assertEqual(cmd_response.exit_code, 0)
         self.assertEqual(cmd_response.stderr, [])
@@ -163,7 +165,7 @@ class TestSingleShotCommand(unittest.TestCase):
 class TestLongRunningCommand(unittest.TestCase):
 
     def setUp(self):
-        self._command = LongRunningCommand(FakeRequestSender())
+        self._command = LongRunningCommand(EtreeRequestSender(FakeRequestSender()))
 
     def tearDown(self):
         self._command = None
@@ -202,7 +204,7 @@ class TestLongRunningCommand(unittest.TestCase):
 class TestTypeperf(unittest.TestCase):
 
     def setUp(self):
-        self._command = Typeperf(LongRunningCommand(FakeRequestSender()))
+        self._command = Typeperf(LongRunningCommand(EtreeRequestSender(FakeRequestSender())))
 
     def tearDown(self):
         self._command = None
